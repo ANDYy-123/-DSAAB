@@ -8,7 +8,7 @@ import java.util.*;
 public class Astar {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File input = new File("src/data/sample3.in");
+        File input = new File("src/data/sample2.in");
         Scanner in = new Scanner(input);
         int n = in.nextInt();
         int m = in.nextInt();
@@ -21,7 +21,46 @@ public class Astar {
             }
         }
 
-        Stack<Node> output = solve(initial, o, n, m);
+        Node root = new Node(initial, findO(initial, o));
+
+        if (in.hasNext()){
+            int b_num = in.nextInt();
+            for (int i = 1; i <= b_num; i++) {
+                int b0 = in.nextInt();
+                int index = 0;
+                for (int j = 0; j < n * m; j++) {
+                    if (initial[i] == b0){
+                        index = j;
+                        break;
+                    }
+                }
+                String b1 = in.nextLine();
+                if (b1.equals("1*2")) {
+                    int[] block = new int[2];
+                    block[0] = initial[index];
+                    block[1] = initial[index + 1];
+                    Block b = new Block(block, "1*2");
+                    root.addBlock(b);
+                }else if (b1.equals("2*1")) {
+                    int[] block = new int[2];
+                    block[0] = initial[index];
+                    block[1] = initial[index + m];
+                    Block b = new Block(block, "2*1");
+                    root.addBlock(b);
+                }else if (b1.equals("2*2")) {
+                    int[] block = new int[4];
+                    block[0] = initial[index];
+                    block[1] = initial[index + 1];
+                    block[2] = initial[index + m];
+                    block[3] = initial[index + 1 + m];
+                    Block b = new Block(block, "2*2");
+                    root.addBlock(b);
+                }
+
+            }
+        }
+
+        Stack<Node> output = solve(initial, root, o, n, m);
         if (output.isEmpty()){
             System.out.println(-1);
         }else {
@@ -40,14 +79,13 @@ public class Astar {
 //        System.out.println(score(node, 4, 4));
     }
 
-    public static Stack<Node> solve(int[] initial, int o, int n, int m){
+    public static Stack<Node> solve(int[] initial, Node root, int o, int n, int m){
         MinPQ<Node> open = new MinPQ<>(new Comparator<Node>() {
             @Override
             public int compare(Node o1, Node o2) {
                 return o1.getF() - o2.getF();
             }
         });
-        Node root = new Node(initial, findO(initial, o));
         open.insert(root);
 
         ArrayList<Node> close = new ArrayList<>();
@@ -80,20 +118,21 @@ public class Astar {
             }else {
 
                 for (int i = 0; i < zero.length; i++) {
-                    if (canMoveL(n, m, zero[i])) {
-                        int[] a = moveL(doing.getNum(), n, m, zero[i]);
+
+                    int[] a = moveL(doing.getNum(), n, m, zero[i], doing.getBlock());
+                    if (a != null) {
                         addNode(doing, a, o, n, m, open, close);
                     }
-                    if (canMoveR(n, m, zero[i])) {
-                        int[] a = moveR(doing.getNum(), n, m, zero[i]);
+                    a = moveR(doing.getNum(), n, m, zero[i], doing.getBlock());
+                    if (a != null){
                         addNode(doing, a, o, n, m, open, close);
                     }
-                    if (canMoveU(n, m, zero[i])) {
-                        int[] a = moveU(doing.getNum(), n, m, zero[i]);
+                    a = moveU(doing.getNum(), n, m, zero[i], doing.getBlock());
+                    if (a != null){
                         addNode(doing, a, o, n, m, open, close);
                     }
-                    if (canMoveD(n, m, zero[i])) {
-                        int[] a = moveD(doing.getNum(), n, m, zero[i]);
+                    a = moveD(doing.getNum(), n, m, zero[i], doing.getBlock());
+                    if (a != null){
                         addNode(doing, a, o, n, m, open, close);
                     }
                 }
@@ -111,11 +150,12 @@ public class Astar {
         System.out.println("");
     }
 
-    public static void addNode(Node parent, int[] child, int o, int n, int m,MinPQ<Node> open, ArrayList<Node> close){
+    public static void addNode(Node parent, int[] child, int o, int n, int m, MinPQ<Node> open, ArrayList<Node> close){
         Node node = new Node(child, findO(child, o));
         node.setParent(parent);
         node.setF(score(node, n, m));
         node.setG(node.getG() + 1);
+        node.setBlock(parent.getBlock());
 
         if (!isInClose(close, node)){
             if (!isInOpen(open, node)){
@@ -184,54 +224,346 @@ public class Astar {
         return node.getG() + score;
     }
 
-    public static boolean canMoveL(int n, int m, int i){
+    public static int[] moveL(int[] initial, int n, int m, int i, ArrayList<Block> blocks){
         if (i % m == 0 || i <= 0) {
-            return false;
-        }else return true;
+            return null;
+        }else {
+            for (int j = 0; j < blocks.size(); j++) {
+                for (int k = 0; k < blocks.get(j).getElement().length; k++) {
+                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                        String b = blocks.get(j).getType();
+                        if (b.equals("1*2")){
+                            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                            int tmp = aux[i];
+                            aux[i] = aux[i-1];
+                            aux[i-1] = aux[i-2];
+                            aux[i-2] = tmp;
+                            return aux;
+                        }else if ((b.equals("2*1"))){
+                            if (k % 2 == 0){
+                                if (initial[i + m] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i-1];
+                                    aux[i-1] = tmp;
+                                    tmp = aux[i + m];
+                                    aux[i + m] = aux[i + m - 1];
+                                    aux[i + m - 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - m] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i - 1];
+                                    aux[i - 1] = tmp;
+                                    tmp = aux[i - m];
+                                    aux[i - m] = aux[i - m - 1];
+                                    aux[i - m - 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }else if (b.equals("2*2")){
+                            if (k % 2 == 0){
+                                if (initial[i + m] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i-1];
+                                    aux[i-1] = aux[i-2];
+                                    aux[i-2] = tmp;
+                                    tmp = aux[i + m];
+                                    aux[i + m] = aux[i + m - 1];
+                                    aux[i + m - 1] = aux[i + m - 2];
+                                    aux[i + m - 2] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - m] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i-1];
+                                    aux[i-1] = aux[i-2];
+                                    aux[i-2] = tmp;
+                                    tmp = aux[i - m];
+                                    aux[i - m] = aux[i - m - 1];
+                                    aux[i - m - 1] = aux[i - m - 2];
+                                    aux[i - m - 2] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+            int tmp = aux[i];
+            aux[i] = aux[i-1];
+            aux[i-1] = tmp;
+            return aux;
+        }
     }
-    public static boolean canMoveR(int n, int m, int i){
+    public static int[] moveR(int[] initial, int n, int m, int i, ArrayList<Block> blocks){
         if ((i + 1) % m == 0 || i < 0 || i >= n * m - 1) {
-            return false;
-        }else return true;
+            return null;
+        }else {
+            for (int j = 0; j < blocks.size(); j++) {
+                for (int k = 0; k < blocks.get(j).getElement().length; k++) {
+                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                        String b = blocks.get(j).getType();
+                        if (b.equals("1*2")){
+                            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                            int tmp = aux[i];
+                            aux[i] = aux[i+1];
+                            aux[i+1] = aux[i+2];
+                            aux[i+2] = tmp;
+                            return aux;
+                        }else if ((b.equals("2*1"))){
+                            if (k % 2 == 0){
+                                if (initial[i + m] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i+1];
+                                    aux[i+1] = tmp;
+                                    tmp = aux[i + m];
+                                    aux[i + m] = aux[i + m + 1];
+                                    aux[i + m + 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - m] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i + 1];
+                                    aux[i + 1] = tmp;
+                                    tmp = aux[i - m];
+                                    aux[i - m] = aux[i - m + 1];
+                                    aux[i - m + 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }else if (b.equals("2*2")){
+                            if (k % 2 == 0){
+                                if (initial[i + m] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i+1];
+                                    aux[i+1] = aux[i+2];
+                                    aux[i+2] = tmp;
+                                    tmp = aux[i + m];
+                                    aux[i + m] = aux[i + m + 1];
+                                    aux[i + m + 1] = aux[i + m + 2];
+                                    aux[i + m + 2] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - m] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i+1];
+                                    aux[i+1] = aux[i+2];
+                                    aux[i+2] = tmp;
+                                    tmp = aux[i - m];
+                                    aux[i - m] = aux[i - m + 1];
+                                    aux[i - m + 1] = aux[i - m + 2];
+                                    aux[i - m + 2] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+            int tmp = aux[i];
+            aux[i] = aux[i+1];
+            aux[i+1] = tmp;
+            return aux;
+        }
     }
-    public static boolean canMoveU(int n, int m, int i){
+    public static int[] moveU(int[] initial, int n, int m, int i, ArrayList<Block> blocks){
         if (i / m == 0) {
-            return false;
-        }else return true;
+            return null;
+        }else {
+            for (int j = 0; j < blocks.size(); j++) {
+                for (int k = 0; k < blocks.get(j).getElement().length; k++) {
+                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                        String b = blocks.get(j).getType();
+                        if (b.equals("1*2")){
+                            if (k % 2 == 0) {
+                                if (initial[i + 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i - m];
+                                    aux[i - m] = tmp;
+                                    tmp = aux[i + 1];
+                                    aux[i + 1] = aux[i - m + 1];
+                                    aux[i - m + 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i - m];
+                                    aux[i - m] = tmp;
+                                    tmp = aux[i - 1];
+                                    aux[i - 1] = aux[i - m - 1];
+                                    aux[i - m - 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }else if ((b.equals("2*1"))){
+                            int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                            int tmp = aux[i];
+                            aux[i] = aux[i - m];
+                            aux[i - m] = aux[i - m - m];
+                            aux[i - m - m] = tmp;
+                            return aux;
+                        }else if (b.equals("2*2")){
+                            if (k % 2 == 0){
+                                if (initial[i + 1] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i - m];
+                                    aux[i - m] = aux[i - m - m];
+                                    aux[i - m - m] = tmp;
+                                    tmp = aux[i + 1];
+                                    aux[i + 1] = aux[i - m + 1];
+                                    aux[i - m + 1] = aux[i - m - m + 1];
+                                    aux[i - m - m + 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i - m];
+                                    aux[i - m] = aux[i - m - m];
+                                    aux[i - m - m] = tmp;
+                                    tmp = aux[i - 1];
+                                    aux[i - 1] = aux[i - m - 1];
+                                    aux[i - m - 1] = aux[i - m - m - 1];
+                                    aux[i - m - m - 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+            int tmp = aux[i];
+            aux[i] = aux[i-m];
+            aux[i-m] = tmp;
+            return aux;
+        }
     }
-    public static boolean canMoveD(int n, int m, int i){
+    public static int[] moveD(int[] initial, int n, int m, int i, ArrayList<Block> blocks){
         if (i / m == n - 1) {
-            return false;
-        }else return true;
+            return null;
+        }else {
+            for (int j = 0; j < blocks.size(); j++) {
+                for (int k = 0; k < blocks.get(j).getElement().length; k++) {
+                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                        String b = blocks.get(j).getType();
+                        if (b.equals("1*2")){
+                            if (k % 2 == 0) {
+                                if (initial[i + 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i + m];
+                                    aux[i + m] = tmp;
+                                    tmp = aux[i + 1];
+                                    aux[i + 1] = aux[i + m + 1];
+                                    aux[i + m + 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i + m];
+                                    aux[i + m] = tmp;
+                                    tmp = aux[i - 1];
+                                    aux[i - 1] = aux[i + m - 1];
+                                    aux[i + m - 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }else if ((b.equals("2*1"))){
+                            int[] aux = Arrays.copyOfRange(initial, 0, n * m);
+                            int tmp = aux[i];
+                            aux[i] = aux[i + m];
+                            aux[i + m] = aux[i + m + m];
+                            aux[i + m + m] = tmp;
+                            return aux;
+                        }else if (b.equals("2*2")){
+                            if (k % 2 == 0){
+                                if (initial[i + 1] == 0){
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i + m];
+                                    aux[i + m] = aux[i + m + m];
+                                    aux[i + m + m] = tmp;
+                                    tmp = aux[i + 1];
+                                    aux[i + 1] = aux[i + m + 1];
+                                    aux[i + m + 1] = aux[i + m + m + 1];
+                                    aux[i + m + m + 1] = tmp;
+                                    return aux;
+                                }
+                            }else {
+                                if (initial[i - 1] == 0) {
+                                    int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+                                    int tmp = aux[i];
+                                    aux[i] = aux[i + m];
+                                    aux[i + m] = aux[i + m + m];
+                                    aux[i + m + m] = tmp;
+                                    tmp = aux[i - 1];
+                                    aux[i - 1] = aux[i + m - 1];
+                                    aux[i + m - 1] = aux[i + m + m - 1];
+                                    aux[i + m + m - 1] = tmp;
+                                    return aux;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+            int tmp = aux[i];
+            aux[i] = aux[i+m];
+            aux[i+m] = tmp;
+            return aux;
+        }
     }
 
-    public static int[] moveL(int[] initial, int n, int m, int i){
-        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
-        int tmp = aux[i];
-        aux[i] = aux[i-1];
-        aux[i-1] = tmp;
-        return aux;
-    }
-    public static int[] moveR(int[] initial, int n, int m, int i){
-        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
-        int tmp = aux[i];
-        aux[i] = aux[i+1];
-        aux[i+1] = tmp;
-        return aux;
-    }
-    public static int[] moveU(int[] initial, int n, int m, int i){
-        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
-        int tmp = aux[i];
-        aux[i] = aux[i-m];
-        aux[i-m] = tmp;
-        return aux;
-    }
-    public static int[] moveD(int[] initial, int n, int m, int i){
-        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
-        int tmp = aux[i];
-        aux[i] = aux[i+m];
-        aux[i+m] = tmp;
-        return aux;
-    }
+//    public static int[] moveL(int[] initial, int n, int m, int i){
+//        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+//        int tmp = aux[i];
+//        aux[i] = aux[i-1];
+//        aux[i-1] = tmp;
+//        return aux;
+//    }
+//    public static int[] moveR(int[] initial, int n, int m, int i){
+//        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+//        int tmp = aux[i];
+//        aux[i] = aux[i+1];
+//        aux[i+1] = tmp;
+//        return aux;
+//    }
+//    public static int[] moveU(int[] initial, int n, int m, int i){
+//        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+//        int tmp = aux[i];
+//        aux[i] = aux[i-m];
+//        aux[i-m] = tmp;
+//        return aux;
+//    }
+//    public static int[] moveD(int[] initial, int n, int m, int i){
+//        int[] aux = Arrays.copyOfRange(initial, 0, n*m);
+//        int tmp = aux[i];
+//        aux[i] = aux[i+m];
+//        aux[i+m] = tmp;
+//        return aux;
+//    }
 
 }

@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Node {
 
@@ -11,9 +12,18 @@ public class Node {
 
     private Node parent;
 
+    private ArrayList<Block> block;
+
     public Node(int[] num, int[] zero) {
         this.num = num;
         this.zero = zero;
+        block = new ArrayList<>();
+    }
+
+    public Node(int[] num, int[] zero, ArrayList<Block> block){
+        this.num = num;
+        this.zero = zero;
+        this.block = block;
     }
 
     public int[] getNum() {
@@ -34,6 +44,18 @@ public class Node {
 
     public Node getParent() {
         return parent;
+    }
+
+    public ArrayList<Block> getBlock() {
+        return block;
+    }
+
+    public void setBlock(ArrayList<Block> block) {
+        this.block = block;
+    }
+
+    public void addBlock(Block block){
+        this.block.add(block);
     }
 
     public void setNum(int[] num) {
