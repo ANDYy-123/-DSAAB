@@ -8,7 +8,7 @@ import java.util.*;
 public class Astar {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File input = new File("src/data/sample2.in");
+        File input = new File("src/data/sample5.in");
         Scanner in = new Scanner(input);
         int n = in.nextInt();
         int m = in.nextInt();
@@ -29,12 +29,12 @@ public class Astar {
                 int b0 = in.nextInt();
                 int index = 0;
                 for (int j = 0; j < n * m; j++) {
-                    if (initial[i] == b0){
+                    if (initial[j] == b0){
                         index = j;
                         break;
                     }
                 }
-                String b1 = in.nextLine();
+                String b1 = in.next();
                 if (b1.equals("1*2")) {
                     int[] block = new int[2];
                     block[0] = initial[index];
@@ -58,6 +58,7 @@ public class Astar {
                 }
 
             }
+
         }
 
         Stack<Node> output = solve(initial, root, o, n, m);
@@ -73,6 +74,8 @@ public class Astar {
                 System.out.println("");
             }
         }
+
+
 //        int[] a = {5, 1, 2, 4, 9, 6, 3, 8, 13, 15, 10, 11, 14, 0, 7, 12};
 //        int[] o = {13};
 //        Node node = new Node(a, o);
@@ -119,6 +122,17 @@ public class Astar {
 
                 for (int i = 0; i < zero.length; i++) {
 
+//                    Random r = new Random();
+//                    int c = r.nextInt(16) + 1;
+//                    if (c <= 4){
+//
+//                    }else if (c <= 8){
+//
+//                    }else if (c <= 12){
+//
+//                    }else {
+//
+//                    }
                     int[] a = moveL(doing.getNum(), n, m, zero[i], doing.getBlock());
                     if (a != null) {
                         addNode(doing, a, o, n, m, open, close);
@@ -153,9 +167,9 @@ public class Astar {
     public static void addNode(Node parent, int[] child, int o, int n, int m, MinPQ<Node> open, ArrayList<Node> close){
         Node node = new Node(child, findO(child, o));
         node.setParent(parent);
+        node.setBlock(parent.getBlock());
         node.setF(score(node, n, m));
         node.setG(node.getG() + 1);
-        node.setBlock(parent.getBlock());
 
         if (!isInClose(close, node)){
             if (!isInOpen(open, node)){
@@ -213,7 +227,7 @@ public class Astar {
                 int Tm = node.getNum()[i] % m - 1;
                 if (Tm == -1){
                     Tn++;
-                    Tm = 3;
+                    Tm = m - 1;
                 }
 
                 int Nn = i / m;
@@ -250,7 +264,7 @@ public class Astar {
                                     aux[i + m] = aux[i + m - 1];
                                     aux[i + m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - m] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -261,10 +275,10 @@ public class Astar {
                                     aux[i - m] = aux[i - m - 1];
                                     aux[i - m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }else if (b.equals("2*2")){
-                            if (k % 2 == 0){
+                            if (k == 1){
                                 if (initial[i + m] == 0){
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
                                     int tmp = aux[i];
@@ -276,7 +290,7 @@ public class Astar {
                                     aux[i + m - 1] = aux[i + m - 2];
                                     aux[i + m - 2] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - m] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
@@ -289,7 +303,7 @@ public class Astar {
                                     aux[i - m - 1] = aux[i - m - 2];
                                     aux[i - m - 2] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }
                     }
@@ -308,7 +322,7 @@ public class Astar {
         }else {
             for (int j = 0; j < blocks.size(); j++) {
                 for (int k = 0; k < blocks.get(j).getElement().length; k++) {
-                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                    if (initial[i + 1] == blocks.get(j).getElement()[k]){
                         String b = blocks.get(j).getType();
                         if (b.equals("1*2")){
                             int[] aux = Arrays.copyOfRange(initial, 0, n*m);
@@ -328,7 +342,7 @@ public class Astar {
                                     aux[i + m] = aux[i + m + 1];
                                     aux[i + m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - m] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -339,10 +353,10 @@ public class Astar {
                                     aux[i - m] = aux[i - m + 1];
                                     aux[i - m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }else if (b.equals("2*2")){
-                            if (k % 2 == 0){
+                            if (k == 0){
                                 if (initial[i + m] == 0){
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
                                     int tmp = aux[i];
@@ -354,7 +368,7 @@ public class Astar {
                                     aux[i + m + 1] = aux[i + m + 2];
                                     aux[i + m + 2] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - m] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
@@ -367,7 +381,7 @@ public class Astar {
                                     aux[i - m + 1] = aux[i - m + 2];
                                     aux[i - m + 2] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }
                     }
@@ -386,7 +400,7 @@ public class Astar {
         }else {
             for (int j = 0; j < blocks.size(); j++) {
                 for (int k = 0; k < blocks.get(j).getElement().length; k++) {
-                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                    if (initial[i - m] == blocks.get(j).getElement()[k]){
                         String b = blocks.get(j).getType();
                         if (b.equals("1*2")){
                             if (k % 2 == 0) {
@@ -399,7 +413,7 @@ public class Astar {
                                     aux[i + 1] = aux[i - m + 1];
                                     aux[i - m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - 1] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -410,7 +424,7 @@ public class Astar {
                                     aux[i - 1] = aux[i - m - 1];
                                     aux[i - m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }else if ((b.equals("2*1"))){
                             int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -432,7 +446,7 @@ public class Astar {
                                     aux[i - m + 1] = aux[i - m - m + 1];
                                     aux[i - m - m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - 1] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
@@ -445,7 +459,7 @@ public class Astar {
                                     aux[i - m - 1] = aux[i - m - m - 1];
                                     aux[i - m - m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }
                     }
@@ -464,7 +478,7 @@ public class Astar {
         }else {
             for (int j = 0; j < blocks.size(); j++) {
                 for (int k = 0; k < blocks.get(j).getElement().length; k++) {
-                    if (initial[i - 1] == blocks.get(j).getElement()[k]){
+                    if (initial[i + m] == blocks.get(j).getElement()[k]){
                         String b = blocks.get(j).getType();
                         if (b.equals("1*2")){
                             if (k % 2 == 0) {
@@ -477,7 +491,7 @@ public class Astar {
                                     aux[i + 1] = aux[i + m + 1];
                                     aux[i + m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - 1] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -488,7 +502,7 @@ public class Astar {
                                     aux[i - 1] = aux[i + m - 1];
                                     aux[i + m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }else if ((b.equals("2*1"))){
                             int[] aux = Arrays.copyOfRange(initial, 0, n * m);
@@ -510,7 +524,7 @@ public class Astar {
                                     aux[i + m + 1] = aux[i + m + m + 1];
                                     aux[i + m + m + 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }else {
                                 if (initial[i - 1] == 0) {
                                     int[] aux = Arrays.copyOfRange(initial, 0, n*m);
@@ -523,7 +537,7 @@ public class Astar {
                                     aux[i + m - 1] = aux[i + m + m - 1];
                                     aux[i + m + m - 1] = tmp;
                                     return aux;
-                                }
+                                }else return null;
                             }
                         }
                     }
