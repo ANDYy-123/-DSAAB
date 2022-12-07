@@ -8,8 +8,8 @@ import java.util.*;
 public class Astar {
 
     public static void main(String[] args) throws FileNotFoundException {
-        File input = new File("src/data/sample5.in");
-        Scanner in = new Scanner(input);
+//        File input = new File("src/data/sample5.in");
+        Scanner in = new Scanner(System.in);
         int n = in.nextInt();
         int m = in.nextInt();
         int[] initial = new int[n * m];
@@ -169,11 +169,12 @@ public class Astar {
         node.setParent(parent);
         node.setBlock(parent.getBlock());
         node.setF(score(node, n, m));
-        node.setG(node.getG() + 1);
+//        node.setG(node.getG() + 1);
 
         if (!isInClose(close, node)){
             if (!isInOpen(open, node)){
-                print(node.getNum());
+//                print(node.getNum());
+                System.out.println(open.size() + close.size());
                 open.insert(node);
             }
         }
@@ -226,7 +227,7 @@ public class Astar {
                 int Tn = node.getNum()[i] / m;
                 int Tm = node.getNum()[i] % m - 1;
                 if (Tm == -1){
-                    Tn++;
+                    Tn--;
                     Tm = m - 1;
                 }
 
@@ -235,7 +236,7 @@ public class Astar {
                 score += Math.abs(Nn - Tn) + Math.abs(Nm - Tm);
             }
         }
-        return node.getG() + score;
+        return score;// + node.getG()
     }
 
     public static int[] moveL(int[] initial, int n, int m, int i, ArrayList<Block> blocks){
