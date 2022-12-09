@@ -6,7 +6,7 @@ import java.util.*;
 
 public class Astar {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args){
 //        File input = new File("src/data/sample5.in");
         Scanner in = new Scanner(System.in);
         int n = in.nextInt();
@@ -19,7 +19,6 @@ public class Astar {
                 o++;
             }
         }
-
 
         Node root = new Node(initial, findO(initial, o));
 
@@ -63,26 +62,47 @@ public class Astar {
 
         Stack<Node> output = solve(root, o, n, m);
         if (output.isEmpty()){
-            System.out.println(-1);
+            System.out.println("No");
         }else {
-            System.out.println(output.size());
+            System.out.println("Yes");
+            System.out.println(output.size() - 1);
+            int[] aux = output.pop().getNum();
             while(!output.isEmpty()) {
                 int[] a = output.pop().getNum();
-                for (int k = 0; k < a.length; k++) {
-                    System.out.print(a[k] +" ");
-                    if ((k + 1) % m == 0){
-                        System.out.println("");
-                    }
-                }
-                System.out.println("");
+//                for (int k = 0; k < a.length; k++) {
+//                    System.out.print(a[k] +" ");
+//                    if ((k + 1) % m == 0){
+//                        System.out.println("");
+//                    }
+//                }
+//                System.out.println("");
+                out(aux, a, n, m);
+                aux = a;
             }
         }
+    }
 
-
-//        int[] a = {5, 1, 2, 4, 9, 6, 3, 8, 13, 15, 10, 11, 14, 0, 7, 12};
-//        int[] o = {13};
-//        Node node = new Node(a, o);
-//        System.out.println(score(node, 4, 4));
+    public static void out(int[] before, int[] now, int n, int m){
+        int num = 0;
+        int i = 0;
+        for (; i < before.length; i++) {
+            if (before[i] != now[i] && before[i] != 0){
+                num = before[i];
+                break;
+            }
+        }
+        if (i % m != 0 && now[i - 1] == num){
+            System.out.println(num + "  " + "L");
+        }else if ((i + 1) % m != 0 && now[i + 1] == num){
+            System.out.println(num + "  " + "R");
+        }else if (i / m != 0 && now[i - m] == num){
+            System.out.println(num + "  " + "U");
+        }else if (i / m != n - 1 && now[i + m] == num){
+            System.out.println(num + "  " + "D");
+        }
+//        else {
+//            System.out.println("----------------------wrong--------------------");
+//        }
     }
 
     public static Stack<Node> solve(Node root, int o, int n, int m){
@@ -114,9 +134,9 @@ public class Astar {
 
             if (doing.getF() == 0){//end//Todo//same(answer, doing.getNum())
                 //output stack
-                an.setParent(doing);
+//                an.setParent(doing);
                 Stack<Node> stack = new Stack<>();
-                Node node0 = an;
+                Node node0 = doing;
                 stack.push(node0);
                 while(node0.getParent() != null){
                     stack.push(node0.getParent());
@@ -180,7 +200,7 @@ public class Astar {
         if (!isInClose(close, node)){
 
 //            print(node.getNum());
-            System.out.println(close.size());
+//            System.out.println(close.size());
             open.insert(node);
             close.add(node);
         }

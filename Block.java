@@ -1,4 +1,3 @@
-
 public class Block {
 
     private int[] element;
