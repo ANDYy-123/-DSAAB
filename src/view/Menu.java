@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import Music.Music;
+
 
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class Menu extends JFrame {
     int[][] Calculate;
 
     public Menu(int width, int height,int[][] first,Color[] blockColor,int[][] block,int[][] Calculate) {
-        setTitle("2022 CS102A Project Demo"); //设置标题
+        setTitle("主菜单"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
         setSize(WIDTH, HEIGTH);

@@ -1,6 +1,6 @@
 package view;
 
-import Music.Music;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ public class laught extends JFrame{
 
 
     public laught(int width, int height) {
-        setTitle("2022 CS102A Project Demo"); //设置标题
+        setTitle("2022 CS203B Project Demo"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
         setSize(WIDTH, HEIGTH);

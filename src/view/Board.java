@@ -15,19 +15,23 @@ public class Board extends JFrame {
     Color[] blockColor;
     int[][] Calculate;
     int cnt = 0;
+    boolean last = false;
 
 
     public Board(int[][] first, int[][] block, Color[] blockColor, int[][] Calculate) {
-        windows();
         addGif();
+        windows();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.setVisible(true);
+        setLayout(null);
+        setLocationRelativeTo(null);
+//        this.setVisible(true);
         this.block = block;
         this.blockColor = blockColor;
         this.first = first;
         this.Calculate = Calculate;
         addPart(first);
         addPicture();
+
         System.out.println(Calculate.length);
     }
 
@@ -44,7 +48,12 @@ public class Board extends JFrame {
             for (int j = 0; j < first[i].length; j++) {
                 JButton button = new JButton(String.valueOf(upset[i][j]));
                 button.setBounds((360 / first[i].length) * j, (360 / first.length) * i, (360 / first[i].length), (360 / first.length));
-                button.setBackground(blockColor[InBlockLocation(upset[i][j])]);
+                if (upset[i][j] != 0) {
+                    button.setBackground(blockColor[InBlockLocation(upset[i][j])]);
+                } else {
+                    button.setBackground(Color.white);
+                }
+
                 jPanel.add(button);
             }
         }
@@ -83,7 +92,12 @@ public class Board extends JFrame {
             for (int j = 0; j < first[i].length; j++) {
                 JButton button = new JButton(String.valueOf(first[i][j]));
                 button.setBounds((360 / first[i].length) * j, (360 / first.length) * i, (360 / first[i].length), (360 / first.length));
-                button.setBackground(blockColor[InBlockLocation(first[i][j])]);
+                if (first[i][j] != 0) {
+                    button.setBackground(blockColor[InBlockLocation(first[i][j])]);
+                } else {
+                    button.setBackground(Color.white);
+                }
+
                 jPanel.add(button);
             }
         }
@@ -105,12 +119,18 @@ public class Board extends JFrame {
         right.setBounds(813, 247, 57, 57);
         right.addActionListener(e -> {
             cnt++;
-            if (cnt >= Calculate.length-1) {
-                cnt = Calculate.length-1;
-                SwingUtilities.invokeLater(() -> {
-                    laught mainFrame = new laught(240, 240);
-                    mainFrame.setVisible(true);
-                });
+            if (cnt >= Calculate.length - 1) {
+                cnt = Calculate.length - 1;
+                if (!last) {
+                    SwingUtilities.invokeLater(() -> {
+                        laught mainFrame = new laught(240, 240);
+                        mainFrame.setVisible(true);
+                    });
+                }
+                if (last) {
+                    JOptionPane.showMessageDialog(null, "已经结束咧！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
+                }
+                last = true;
 
             }
             upset();

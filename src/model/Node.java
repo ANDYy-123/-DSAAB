@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Node {
 
@@ -10,7 +11,7 @@ public class Node {
 
     private int f;
 
-    private int g;
+//    private int g;
 
     private Node parent;
 
@@ -21,6 +22,19 @@ public class Node {
         this.zero = zero;
         block = new ArrayList<>();
     }
+
+    @Override
+    public int hashCode(){
+        return Arrays.hashCode(num);//f ^= ( f >>> 20) ^ ( f >>> 12) ^ (f >>> 7) ^ (f >>> 4) ;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (obj instanceof Node){
+            return Arrays.equals(((Node) obj).getNum(), this.num);
+        }else return false;
+    }
+
 
     public Node(int[] num, int[] zero, ArrayList<Block> block){
         this.num = num;
@@ -40,9 +54,9 @@ public class Node {
         return f;
     }
 
-    public int getG() {
-        return g;
-    }
+//    public int getG() {
+//        return g;
+//    }
 
     public Node getParent() {
         return parent;
@@ -72,9 +86,9 @@ public class Node {
         this.f = f;
     }
 
-    public void setG(int g) {
-        this.g = g;
-    }
+//    public void setG(int g) {
+//        this.g = g;
+//    }
 
     public void setParent(Node parent) {
         this.parent = parent;

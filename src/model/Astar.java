@@ -2,17 +2,15 @@ package model;
 
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.Stack;
-import model.Node;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Astar {
 
-    public static void main(String[] args) throws FileNotFoundException {
-        File input = new File("src/data/sample5.in");
-        Scanner in = new Scanner(input);
+    public static void main(String[] args){
+//        File input = new File("src/data/sample5.in");
+        Scanner in = new Scanner(System.in);
         int n = in.nextInt();
         int m = in.nextInt();
         int[] initial = new int[n * m];
@@ -64,28 +62,53 @@ public class Astar {
 
         }
 
-        Stack<Node> output = solve(initial, root, o, n, m);
+        Stack<Node> output = solve(root, o, n, m);
         if (output.isEmpty()){
-            System.out.println(-1);
+            System.out.println("No");
         }else {
-            System.out.println(output.size());
+            System.out.println("Yes");
+            System.out.println(output.size() - 1);
+            int[] aux = output.pop().getNum();
             while(!output.isEmpty()) {
                 int[] a = output.pop().getNum();
-                for (int k : a) {
-                    System.out.print(k+" ");
-                }
-                System.out.println("");
+//                for (int k = 0; k < a.length; k++) {
+//                    System.out.print(a[k] +" ");
+//                    if ((k + 1) % m == 0){
+//                        System.out.println("");
+//                    }
+//                }
+//                System.out.println("");
+                out(aux, a, n, m);
+                aux = a;
             }
         }
-
-
-//        int[] a = {5, 1, 2, 4, 9, 6, 3, 8, 13, 15, 10, 11, 14, 0, 7, 12};
-//        int[] o = {13};
-//        Node node = new Node(a, o);
-//        System.out.println(score(node, 4, 4));
     }
 
-    public static Stack<Node> solve(int[] initial, Node root, int o, int n, int m){
+    public static void out(int[] before, int[] now, int n, int m){
+        int num = 0;
+        int i = 0;
+        for (; i < before.length; i++) {
+            if (before[i] != now[i] && before[i] != 0){
+                num = before[i];
+                break;
+            }
+        }
+        if (i % m != 0 && now[i - 1] == num){
+            System.out.println(num + "  " + "L");
+        }else if ((i + 1) % m != 0 && now[i + 1] == num){
+            System.out.println(num + "  " + "R");
+        }else if (i / m != 0 && now[i - m] == num){
+            System.out.println(num + "  " + "U");
+        }else if (i / m != n - 1 && now[i + m] == num){
+            System.out.println(num + "  " + "D");
+        }
+//        else {
+//            System.out.println("----------------------wrong--------------------");
+//        }
+    }
+
+    public static Stack<Node> solve(Node root, int o, int n, int m){
+        root.setF(score(root, n, m));
         MinPQ<Node> open = new MinPQ<>(new Comparator<Node>() {
             @Override
             public int compare(Node o1, Node o2) {
@@ -94,7 +117,9 @@ public class Astar {
         });
         open.insert(root);
 
-        ArrayList<Node> close = new ArrayList<>();
+//        ArrayList<Node> close = new ArrayList<>();
+        HashSet<Node> close = new HashSet<>();
+        close.add(root);
 
         int[] answer = new int[n*m];
         for (int i = 0; i < answer.length - o; i++) {
@@ -105,15 +130,15 @@ public class Astar {
         while (!open.isEmpty()){
 
             Node doing = open.delMin();
-            close.add(doing);
+//            close.put(doing, doing.hashCode());
 
             int[] zero = doing.getZero();
 
-            if (same(answer, doing.getNum())){//end
+            if (doing.getF() == 0){//end//Todo//same(answer, doing.getNum())
                 //output stack
-                an.setParent(doing);
+//                an.setParent(doing);
                 Stack<Node> stack = new Stack<>();
-                Node node0 = an;
+                Node node0 = doing;
                 stack.push(node0);
                 while(node0.getParent() != null){
                     stack.push(node0.getParent());
@@ -167,18 +192,19 @@ public class Astar {
         System.out.println("");
     }
 
-    public static void addNode(Node parent, int[] child, int o, int n, int m, MinPQ<Node> open, ArrayList<Node> close){
+    public static void addNode(Node parent, int[] child, int o, int n, int m, MinPQ<Node> open, HashSet<Node> close){
         Node node = new Node(child, findO(child, o));
         node.setParent(parent);
         node.setBlock(parent.getBlock());
         node.setF(score(node, n, m));
-        node.setG(node.getG() + 1);
+//        node.setG(node.getG() + 1);
 
         if (!isInClose(close, node)){
-            if (!isInOpen(open, node)){
-                print(node.getNum());
-                open.insert(node);
-            }
+
+//            print(node.getNum());
+//            System.out.println(close.size());
+            open.insert(node);
+            close.add(node);
         }
 
     }
@@ -192,13 +218,8 @@ public class Astar {
         return false;
     }
 
-    public static boolean isInClose(ArrayList<Node> close, Node node){//can be improved
-        for (int i = 0; i < close.size(); i++) {
-            if (same(close.get(i).getNum(), node.getNum())){
-                return true;
-            }
-        }
-        return false;
+    public static boolean isInClose(HashSet<Node> close, Node node){//can be improved
+        return close.contains(node);
     }
 
     public static boolean same(int[] o1, int[] o2){//can be improved
@@ -229,7 +250,7 @@ public class Astar {
                 int Tn = node.getNum()[i] / m;
                 int Tm = node.getNum()[i] % m - 1;
                 if (Tm == -1){
-                    Tn++;
+                    Tn--;
                     Tm = m - 1;
                 }
 
@@ -238,7 +259,7 @@ public class Astar {
                 score += Math.abs(Nn - Tn) + Math.abs(Nm - Tm);
             }
         }
-        return node.getG() + score;
+        return score;// + node.getG()
     }
 
     public static int[] moveL(int[] initial, int n, int m, int i, ArrayList<Block> blocks){

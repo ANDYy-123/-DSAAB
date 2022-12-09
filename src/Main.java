@@ -1,4 +1,4 @@
-import Music.Music;
+
 import edu.princeton.cs.algs4.Stack;
 import javazoom.jl.decoder.JavaLayerException;
 import model.Block;
@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-import static model.Astar.findO;
-import static model.Astar.solve;
+import static model.Astar.*;
 
 public class Main {
     public static Color CreateColor() {
@@ -50,7 +49,7 @@ public class Main {
             int b0 = block0[i - 1];
             int index = 0;
             for (int j = 0; j < n * m; j++) {
-                if (initial[i] == b0) {
+                if (initial[j] == b0) {
                     index = j;
                     break;
                 }
@@ -79,23 +78,22 @@ public class Main {
             }
 
         }
-        Stack<Node> output = solve(initial, root, o, n, m);
-        int[][] answer = new int[output.size()-1][];
+        Stack<Node> output = solve(root, o, n, m);
+        int size = output.size();
+        int[][] answer = new int[output.size()][];
         if (output.isEmpty()) {
-            System.out.println(-1);
+            System.out.println("No");
         } else {
-            System.out.println(output.size()-1);
-            for (int i = 0; i < output.size()-1; i++) {
+            System.out.println("Yes");
+            System.out.println(output.size() - 1);
+            for (int i = 0; i < size ; i++) {
                 answer[i] = output.pop().getNum();
-            }
-
-            for (int s = 0; s < answer.length; s++) {
-                System.out.print(Arrays.toString(answer[s]) + " ");
-                if ((s + 1) % m == 0) {
-                    System.out.println();
+                if (i > 0) {
+                    out(answer[i-1],answer[i] , n, m);
                 }
             }
-            System.out.println("____________");
+
+
         }
         return answer;
     }
@@ -103,11 +101,11 @@ public class Main {
     //直接算出哪几个结块再传进Board就好，每次读档加个判断
     public static void main(String[] args) throws FileNotFoundException, JavaLayerException {
         Scanner input = new Scanner(System.in);
-        System.out.println("width:");
+//        System.out.println("width:");
         int width = input.nextInt();
-        System.out.println("length:");
+//        System.out.println("length:");
         int length = input.nextInt();
-        System.out.println("HuaRongDao:");
+//        System.out.println("HuaRongDao:");
         int[][] firstStatement = new int[width][length];
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < length; j++) {
@@ -124,6 +122,9 @@ public class Main {
             block0[i] = input.nextInt();
             blockStyle[i] = input.next();
         }
+//        for (int i=0;i< blockStyle.length;i++){
+//            System.out.println(block0[i]);
+//        }
         for (int i = 0; i < blockColor.length; i++) {
             blockColor[i] = CreateColor();
         }
