@@ -24,7 +24,7 @@ public class Board extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLayout(null);
         setLocationRelativeTo(null);
-//        this.setVisible(true);
+        this.setVisible(true);
         this.block = block;
         this.blockColor = blockColor;
         this.first = first;
@@ -67,7 +67,8 @@ public class Board extends JFrame {
         this.setSize(960, 565);
         this.setDefaultCloseOperation(3);
         this.setLayout(null);
-        this.setLocationRelativeTo(null);
+//        this.setLocationRelativeTo(null);
+        setLocation(450,300);
         this.setAlwaysOnTop(true);
     }
 
@@ -127,9 +128,9 @@ public class Board extends JFrame {
                         mainFrame.setVisible(true);
                     });
                 }
-                if (last) {
-                    JOptionPane.showMessageDialog(null, "已经结束咧！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
-                }
+//                if (last) {
+//                    JOptionPane.showMessageDialog(null, "已经结束咧！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
+//                }
                 last = true;
 
             }
