@@ -69,7 +69,7 @@ public class Board extends JFrame {
         this.setLayout(null);
 //        this.setLocationRelativeTo(null);
         setLocation(450,300);
-        this.setAlwaysOnTop(true);
+//        this.setAlwaysOnTop(true);
     }
 
     public int InBlockLocation(int chess) {
@@ -128,9 +128,9 @@ public class Board extends JFrame {
                         mainFrame.setVisible(true);
                     });
                 }
-//                if (last) {
-//                    JOptionPane.showMessageDialog(null, "已经结束咧！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
-//                }
+                if (last) {
+                    JOptionPane.showMessageDialog(null, "已经结束咧！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
+                }
                 last = true;
 
             }
