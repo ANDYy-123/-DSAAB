@@ -13,6 +13,8 @@ public class randomBoardTest {
             }
             System.out.print(" ");
         }
+        System.out.println("");
+        System.out.print(randomboard.b);
         for (int i=0;i<randomboard.node.getBlock().size();i++){
              Block block=randomboard.node.getBlock().get(i);
             System.out.println("");
