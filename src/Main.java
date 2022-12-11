@@ -83,6 +83,7 @@ public class Main {
         int[][] answer = new int[output.size()][];
         if (output.isEmpty()) {
             System.out.println("No");
+            return null;
         } else {
             System.out.println("Yes");
             System.out.println(output.size() - 1);
@@ -163,12 +164,17 @@ public class Main {
 //            }
 //        }
 
-
-        SwingUtilities.invokeLater(() -> {
-            Menu mainFrame = new Menu(641, 834, firstStatement, blockColor, block, Calculate(NumBlock, firstStatement, block0, blockStyle));
+        int[][] answer=Calculate(NumBlock, firstStatement, block0, blockStyle);
+        if (answer==null){
+            JOptionPane.showMessageDialog(null, "无解！", "FBI WARNING", JOptionPane.INFORMATION_MESSAGE);
+        }else {
+            SwingUtilities.invokeLater(() -> {
+                Menu mainFrame = new Menu(641, 834, firstStatement, blockColor, block,answer);
 //            Menu mainFrame = new Menu(641, 834, firstStatement, blockColor, block, test);
 
-            mainFrame.setVisible(true);
-        });
+                mainFrame.setVisible(true);
+            });
+        }
+
     }
 }
